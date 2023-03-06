@@ -16,46 +16,56 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       selectInput("country", "Country", c(countries)),
-      selectInput("mfr", "Manufacturer", c(companies)),
       sliderInput("years", "Years", minYear, maxYear,
-        c(minYear, maxYear), step = 1, sep = "")
+        c(minYear, maxYear), step = 1, sep = ""),
+      hr(),
+      selectInput("mfr", "Manufacturer", c(companies))
     ),
     
     
-    mainPanel(plotOutput("distPlot", 
-                         brush = brushOpts("plot_brush", 
-                                           resetOnNew = T, 
-                                           direction = "x")),
+    mainPanel(plotOutput("distPlot"),
               dataTableOutput("table")
     )
   )
 )
 
-server <- function(input, output) {
-  observeEvent(input$plot_brush, {
-    info_plot <- brushedPoints(df, input$plot_brush)
-    output$table <- renderDataTable(info_plot)
+server <- function(input, output, session) {
+  observe({
+    df.filtered <- df %>% filter(
+        Year >= input$years[1] &
+        Year <= input$years[2] &
+        Country == input$country
+    )
+    
+    updateSelectInput(session, "mfr",
+                      choices = c(unique(df.filtered$Company.Name)))
   })
   
   output$distPlot <- renderPlot({
     ggplot(
       df %>% filter(
-        Year >= input$years[1] &
+          Year >= input$years[1] &
           Year <= input$years[2] &
           Company.Name == input$mfr &
           Country == input$country
       ),
       aes(
         x = Year,
-        fill = Status.Mission,
-        text = paste("Country:", Country)
+        fill = Status.Mission
       )
     ) +
-      geom_dotplot(binwidth = .25) +
+      geom_dotplot(binwidth = .25, position=position_dodge(0.8)) +
       geom_rug() +
       scale_y_continuous(breaks = NULL) +
       theme(axis.title.y = element_blank())
   })
+  
+  output$table <- renderDataTable(df %>% filter(
+    Year >= input$years[1] &
+      Year <= input$years[2] &
+      Company.Name == input$mfr &
+      Country == input$country
+  ))
   
 }
 
