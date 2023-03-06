@@ -57,6 +57,7 @@ server <- function(input, output, session) {
       geom_dotplot(binwidth = .25, position=position_dodge(0.8)) +
       geom_rug() +
       scale_y_continuous(breaks = NULL) +
+      scale_x_continuous(labels=c(df$Year), breaks=c(df$Year)) +
       theme(axis.title.y = element_blank())
   })
   
