@@ -1,7 +1,7 @@
 library(shiny)
 library(dplyr)
 library(ggplot2)
-library(plotly)
+#library(plotly)
 
 df <- read.csv("rockets.csv")
 
