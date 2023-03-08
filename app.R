@@ -4,9 +4,11 @@ library(ggplot2)
 library(shinyWidgets)
 
 df <- read.csv("rockets.csv")
+# Convert string 'Wed Sep 30, 2015 20:30 UTC' to date
+df$Date <- as.Date(df$Datum, "%a %b %d, %Y")
 
 companies <- unique(df$Company.Name)
-countries <- unique(df$Country)
+countries <- sort(unique(df$Country))
 minYear <- min(df$Year)
 maxYear <- max(df$Year)
 
@@ -65,7 +67,8 @@ server <- function(input, output, session) {
   
   output$table <- renderDataTable({
     df.filter1() %>% filter(Company.Name %in% input$mfr)
-    }, options=list(columnDefs = list(list(visible=FALSE, targets=c(4, 5, 6, 8, 9)))))
+    }, options=list(order = list(10, 'asc'),
+                    columnDefs = list(list(visible=FALSE, targets=c(2, 4, 5, 6, 8, 9)))))
   
 }
 
