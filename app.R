@@ -7,8 +7,10 @@ df <- read.csv("rockets.csv")
 # Convert string 'Wed Sep 30, 2015 20:30 UTC' to date
 df$Date <- as.Date(df$Datum, "%a %b %d, %Y")
 
+# Populate selection boxes
 companies <- unique(df$Company.Name)
 countries <- sort(unique(df$Country))
+# Endpoints for slider
 minYear <- min(df$Year)
 maxYear <- max(df$Year)
 
@@ -34,6 +36,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
+  # Filter dataset on country and years
   df.filter1 <- reactive({
     df %>% filter(
         Year >= input$years[1] &
@@ -43,20 +46,20 @@ server <- function(input, output, session) {
   })
   
 
+  # Use filtered dataset to repopulate the Manufacturer dropdown
+  # with companies that meet the country/year criteria
   observeEvent(input$country, {
-    
     updatePickerInput(session = session, inputId = "mfr",
                       choices = sort(unique(df.filter1()$Company.Name)),
                       selected = sort(unique(df.filter1()$Company.Name)))
   })
   
+  # Apply the manufacturer filter and create a dotplot showing each
+  # launch as a dot, color-coded to indicate the mission outcome
   output$distPlot <- renderPlot({
     ggplot(
       df.filter1() %>% filter(Company.Name %in% input$mfr),
-      aes(
-        x = Year,
-        fill = Status.Mission
-      )
+      aes(x = Year, fill = Status.Mission)
     ) +
       geom_dotplot(binwidth = .25, position=position_dodge(0.8)) +
       geom_rug() +
@@ -65,6 +68,8 @@ server <- function(input, output, session) {
       theme(axis.title.y = element_blank())
   })
   
+  # Populate the datatable with the filtered data set and sort by mission
+  # date (earliest to latest). Hide columns with extraneous information.
   output$table <- renderDataTable({
     df.filter1() %>% filter(Company.Name %in% input$mfr)
     }, options=list(order = list(10, 'asc'),
