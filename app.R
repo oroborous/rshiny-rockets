@@ -64,13 +64,13 @@ server <- function(input, output, session) {
       theme(axis.title.y = element_blank())
   })
   
-  output$table <- renderDataTable(df %>% filter(
+  output$table <- renderDataTable({df %>% filter(
     Year >= input$years[1] &
       Year <= input$years[2] &
       Company.Name == input$mfr &
       #if (input$mfr == "ALL") TRUE else Company.Name == input$mfr &
       if (input$country == "ALL") TRUE else Country == input$country
-  ))
+  )}, options=list(columnDefs = list(list(visible=FALSE, targets=c(4, 5, 6, 8, 9)))))
   
 }
 
