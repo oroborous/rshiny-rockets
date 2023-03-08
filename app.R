@@ -15,11 +15,12 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      selectInput("country", "Country", c(countries)),
+      selectInput("country", "Country", c("ALL", countries)),
       sliderInput("years", "Years", minYear, maxYear,
         c(minYear, maxYear), step = 1, sep = ""),
       hr(),
       selectInput("mfr", "Manufacturer", c(companies))
+      #selectInput("mfr", "Manufacturer", c("ALL", companies))
     ),
     
     
@@ -34,11 +35,12 @@ server <- function(input, output, session) {
     df.filtered <- df %>% filter(
         Year >= input$years[1] &
         Year <= input$years[2] &
-        Country == input$country
+        if (input$country == "ALL") TRUE else Country == input$country
     )
     
     updateSelectInput(session, "mfr",
                       choices = c(unique(df.filtered$Company.Name)))
+#                      choices = c("ALL", unique(df.filtered$Company.Name)))
   })
   
   output$distPlot <- renderPlot({
@@ -47,7 +49,8 @@ server <- function(input, output, session) {
           Year >= input$years[1] &
           Year <= input$years[2] &
           Company.Name == input$mfr &
-          Country == input$country
+          #if (input$mfr == "ALL") TRUE else Company.Name == input$mfr &
+          if (input$country == "ALL") TRUE else Country == input$country
       ),
       aes(
         x = Year,
@@ -65,7 +68,8 @@ server <- function(input, output, session) {
     Year >= input$years[1] &
       Year <= input$years[2] &
       Company.Name == input$mfr &
-      Country == input$country
+      #if (input$mfr == "ALL") TRUE else Company.Name == input$mfr &
+      if (input$country == "ALL") TRUE else Country == input$country
   ))
   
 }
