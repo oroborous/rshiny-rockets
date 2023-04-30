@@ -1,0 +1,13 @@
+name: rshiny-rockets
+title:
+username:
+account: oroborous
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8492742
+bundleId: 6932473
+url: https://oroborous.shinyapps.io/rshiny-rockets/
+when: 1678301805.70264
+lastSyncTime: 1678301805.70265
+asMultiple: FALSE
+asStatic: FALSE

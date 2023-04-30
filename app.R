@@ -25,7 +25,8 @@ ui <- fluidPage(
       hr(),
       pickerInput("mfr", "Manufacturer", c(companies),
                   options = list('actions-box' = TRUE),
-                  multiple = TRUE)
+                  multiple = TRUE),
+      verbatimTextOutput("temp")
     ),
     
     
@@ -36,6 +37,9 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
+  # View value of pickerInput for debug
+  output$temp <- renderPrint(input$mfr)
+  
   # Filter dataset on country and years
   df.filter1 <- reactive({
     df %>% filter(
